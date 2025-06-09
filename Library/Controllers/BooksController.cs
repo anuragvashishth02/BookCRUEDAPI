@@ -1,7 +1,6 @@
-﻿using Library.Data;
+﻿using Library.Managers;
 using Library.Models;
 using Library.Models.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Controllers
@@ -10,86 +9,42 @@ namespace Library.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly IBookManager _bookManager;
 
-        public BooksController(ApplicationDbContext dbContext)
+        public BooksController(IBookManager bookManager)
         {
-            this.dbContext = dbContext;
-        }
-
-
-        [HttpGet]
-        public IActionResult GetAllBooks()
-        {
-            var allbooks = dbContext.Books.ToList();
-            return Ok(allbooks);
+            _bookManager = bookManager;
         }
 
         [HttpGet]
-        [Route("{id:guid}")]
+        public IActionResult GetAllBooks() => Ok(_bookManager.GetAll());
 
+        [HttpGet("{id:guid}")]
         public IActionResult GetBookByID(Guid id)
         {
-          var books = dbContext.Books.Find(id);
-
-            if(books is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(books);
+            var book = _bookManager.GetById(id);
+            return book == null ? NotFound() : Ok(book);
         }
 
         [HttpPost]
-        public IActionResult AddBooks([FromBody] List<AddBookDto> addBookDtos)
+        public IActionResult AddBooks([FromBody] List<AddBookDto> dtos)
         {
-            var bookEntities = addBookDtos.Select(dto => new Books
-            {
-                Title = dto.Title,
-                Author = dto.Author,
-                Description = dto.Description
-            }).ToList();
-
-            dbContext.Books.AddRange(bookEntities);
-            dbContext.SaveChanges();
-
-            return Ok(bookEntities);
+            var books = _bookManager.AddBooks(dtos);
+            return Ok(books);
         }
 
-        [HttpPut]
-        [Route("{id:guid}")]
-        public IActionResult UpdateBook(Guid id,UpdateBookDto updateBookDto)
+        [HttpPut("{id:guid}")]
+        public IActionResult UpdateBook(Guid id, [FromBody] UpdateBookDto dto)
         {
-            var book = dbContext.Books.Find(id);
-
-            if (book is null)
-            {
-                return NotFound();
-            }
-
-            book.Title = updateBookDto.Title;
-            book.Author = updateBookDto.Author;
-            book.Description = updateBookDto.Description;
-
-            dbContext.SaveChanges();
-
-            return Ok();
-               
+            var success = _bookManager.UpdateBook(id, dto);
+            return success ? Ok() : NotFound();
         }
-        [HttpDelete]
-        [Route("{id:guid}")]
+
+        [HttpDelete("{id:guid}")]
         public IActionResult DeleteBook(Guid id)
         {
-            var book= dbContext.Books.Find(id);
-
-            if(book is null)
-            {
-                return NotFound(); 
-            }
-            dbContext.Books.Remove(book);
-            dbContext.SaveChanges();
-
-            return Ok();
-        } 
+            var success = _bookManager.DeleteBook(id);
+            return success ? Ok() : NotFound();
+        }
     }
 }
