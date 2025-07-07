@@ -4,11 +4,11 @@ namespace Library.Repository
 {
     public interface IBookRepository
     {
-        List<Books> GetAll();
-        Books? GetById(Guid id);
-        void AddRange(List<Books> books);
+       Task <List<Books>> GetAllAsync();
+       Task <Books?> GetByIdAsync(Guid id);
+       Task AddRangeAsync(List<Books> books);
         void Update(Books book);
         void Delete(Books book);
-        void Save();
+        Task SaveAsync();
     }
 }

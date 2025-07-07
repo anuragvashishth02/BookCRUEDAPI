@@ -5,10 +5,10 @@ namespace Library.Managers
 {
     public interface IBookManager
     {
-        List<Books> GetAll();
-        Books? GetById(Guid id);
-        List<Books> AddBooks(List<AddBookDto> books);
-        bool UpdateBook(Guid id, UpdateBookDto dto);
-        bool DeleteBook(Guid id);
+       Task <List<Books>> GetAllAsync();
+       Task < Books?> GetByIdAsync(Guid id);
+       Task <List<Books>> AddBooksAsync(List<AddBookDto> books);
+       Task <bool> UpdateBookAsync(Guid id, UpdateBookDto dto);
+       Task <bool> DeleteBookAsync(Guid id);
     }
 }

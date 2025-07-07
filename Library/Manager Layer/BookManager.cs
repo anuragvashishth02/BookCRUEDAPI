@@ -13,11 +13,11 @@ namespace Library.Managers
             _repo = repo;
         }
 
-        public List<Books> GetAll() => _repo.GetAll();
+        public async Task <List<Books>> GetAllAsync() => await _repo.GetAllAsync();
 
-        public Books? GetById(Guid id) => _repo.GetById(id);
+        public async Task <Books?> GetByIdAsync(Guid id) => await _repo.GetByIdAsync(id);
 
-        public List<Books> AddBooks(List<AddBookDto> dtos)
+        public async Task <List<Books>> AddBooksAsync(List<AddBookDto> dtos)
         {
             var books = dtos.Select(dto => new Books
             {
@@ -26,14 +26,14 @@ namespace Library.Managers
                 Description = dto.Description
             }).ToList();
 
-            _repo.AddRange(books);
-            _repo.Save();
+            await _repo.AddRangeAsync(books);
+            await _repo.SaveAsync();
             return books;
         }
 
-        public bool UpdateBook(Guid id, UpdateBookDto dto)
+        public async Task <bool> UpdateBookAsync(Guid id, UpdateBookDto dto)
         {
-            var book = _repo.GetById(id);
+            var book = await _repo.GetByIdAsync(id);
             if (book is null) return false;
 
             book.Title = dto.Title;
@@ -41,17 +41,17 @@ namespace Library.Managers
             book.Description = dto.Description;
 
             _repo.Update(book);
-            _repo.Save();
+            await _repo.SaveAsync();
             return true;
         }
 
-        public bool DeleteBook(Guid id)
+        public async Task <bool> DeleteBookAsync(Guid id)
         {
-            var book = _repo.GetById(id);
+            var book = await _repo.GetByIdAsync(id);
             if (book is null) return false;
 
             _repo.Delete(book);
-            _repo.Save();
+            await _repo.SaveAsync();
             return true;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Library.Data;
 using Library.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Library.Repository
 {
@@ -12,16 +13,15 @@ namespace Library.Repository
             _context = context;
         }
 
-        public List<Books> GetAll() => _context.Books.ToList();
+        public async Task<List<Books>> GetAllAsync() => await _context.Books.ToListAsync();
+        public async Task <Books?> GetByIdAsync(Guid id) => await _context.Books.FindAsync(id);
 
-        public Books? GetById(Guid id) => _context.Books.Find(id);
-
-        public void AddRange(List<Books> books) => _context.Books.AddRange(books);
+        public async Task AddRangeAsync(List<Books> books) => await _context.Books.AddRangeAsync(books);
 
         public void Update(Books book) => _context.Books.Update(book);
 
         public void Delete(Books book) => _context.Books.Remove(book);
 
-        public void Save() => _context.SaveChanges();
+        public async Task SaveAsync() => await _context.SaveChangesAsync();
     }
 }
